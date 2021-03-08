@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"kondocontrol/internal/convert"
 	"kondocontrol/internal/eeprom"
 	"log"
@@ -45,15 +46,29 @@ func main() {
 
 	// Make sure to close it later.
 	defer port.Close()
-	// writeAndRead(port, []byte{0b10100100})
-	r := readEEPROM(0, scEEPROM, port)
-	fmt.Println(printHex(r), len(r))
-	// trySetPosition(port)
-	// tryFree(port)
-	// speedValue := uint8(50)
-	// for i := 0; i <= 10; i++ {
-	// 	writeEEPROM(uint8(i), scSpeed, []byte{speedValue}, port)
-	// }
+
+	{ // test readEEPROM
+		// r := readEEPROM(0, scEEPROM, port)
+		// fmt.Println(printHex(r), len(r))
+	}
+
+	{ // test setPosition and Free mode
+		// trySetPosition(port)
+		// tryFree(port)
+		// speedValue := uint8(50)
+		// for i := 0; i <= 10; i++ {
+		// 	writeEEPROM(uint8(i), scSpeed, []byte{speedValue}, port)
+		// }
+	}
+
+	{ // test data file
+		testingFilePath := "./Ignore/data"
+		dat, err := ioutil.ReadFile(testingFilePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(printHex(dat))
+	}
 
 }
 func writeEEPROM(id uint8, sc subCommand, data []byte, port io.ReadWriteCloser) {
@@ -73,12 +88,27 @@ func readEEPROM(id uint8, sc subCommand, port io.ReadWriteCloser) []byte {
 	b := []byte{cmd, uint8(sc)}
 	fmt.Println(printHex(b))
 	result := writeAndRead(port, b)
-	e, err := eeprom.Parsing(result)
+	e, err := eeprom.Parsing(result[2:])
 	if err != nil {
 		log.Fatalf("eeprom.Parsing: %+v", err)
 		return nil
 	}
 	fmt.Printf("%+v\n", e)
+
+	// save data
+	// testingFilePath := "./Ignore/testing"
+	// {
+	// 	f, err := os.Create(testingFilePath)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	n, err := f.Write(result[2:])
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	println(n)
+	// 	f.Close()
+	// }
 	return result
 }
 func trySetPosition(port io.ReadWriteCloser) {
