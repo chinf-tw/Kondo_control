@@ -1,0 +1,78 @@
+{
+    "fixed": {
+        "start": 0,
+        "end": 2
+    },
+    "stretch-gain": {
+        "start": 2,
+        "end": 4
+    },
+    "speed": {
+        "start": 4,
+        "end": 6
+    },
+    "punch": {
+        "start": 6,
+        "end": 8
+    },
+    "dead-band": {
+        "start": 8,
+        "end": 10
+    },
+    "damping": {
+        "start": 10,
+        "end": 12
+    },
+    "safe-timer": {
+        "start": 12,
+        "end": 14
+    },
+    "flag": {
+        "start": 14,
+        "end": 16
+    },
+    "maximum-pulse-limit": {
+        "start": 16,
+        "end": 20
+    },
+    "minimum-pulse-limit": {
+        "start": 20,
+        "end": 24
+    },
+    "signal-speed": {
+        "start": 26,
+        "end": 28
+    },
+    "temperature-limit": {
+        "start": 28,
+        "end": 30
+    },
+    "current-limit": {
+        "start": 30,
+        "end": 32
+    },
+    "response": {
+        "start": 50,
+        "end": 52
+    },
+    "user-offset": {
+        "start": 52,
+        "end": 54
+    },
+    "id": {
+        "start": 56,
+        "end": 58
+    },
+    "characteristic-change-stretch1": {
+        "start": 58,
+        "end": 60
+    },
+    "characteristic-change-stretch2": {
+        "start": 60,
+        "end": 62
+    },
+    "characteristic-change-stretch3": {
+        "start": 62,
+        "end": 64
+    }
+}

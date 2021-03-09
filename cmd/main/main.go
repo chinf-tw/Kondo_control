@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -62,12 +63,28 @@ func main() {
 	}
 
 	{ // test data file
+		// testingFilePath := "./Ignore/data"
+		// dat, err := ioutil.ReadFile(testingFilePath)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// fmt.Println(printHex(dat))
+	}
+	{ // convert data address to json
 		testingFilePath := "./Ignore/data"
 		dat, err := ioutil.ReadFile(testingFilePath)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(printHex(dat))
+		ee, err := eeprom.Parsing(dat)
+		if err != nil {
+			log.Fatalf("%+v\n", err)
+		}
+		j, err := json.Marshal(ee.Address)
+		if err != nil {
+			log.Fatalf("json.Marshal: %v", err)
+		}
+		fmt.Println(string(j))
 	}
 
 }

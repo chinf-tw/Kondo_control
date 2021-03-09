@@ -26,6 +26,7 @@ type EEPROM struct {
 	CharacteristicChangeStretch1 uint8
 	CharacteristicChangeStretch2 uint8
 	CharacteristicChangeStretch3 uint8
+	Address                      Address
 }
 
 // Flag is KONDO servo motor flag
@@ -57,13 +58,14 @@ func Parsing(bs []byte) (EEPROM, error) {
 		return EEPROM{}, ErrDataLength
 	}
 	var (
-		result        = EEPROM{}
-		mark          = uint8(0)
-		recordAddress = make(map[string][]byte)
+		result = EEPROM{}
+		mark   = uint8(0)
+		// recordAddress = make(map[string][]byte)
+		address = Address{}
 	)
 
-	recordFunc := func(key string, add uint8) {
-		recordAddress[key] = []byte{mark, mark + add}
+	recordFunc := func(key *Interval, add uint8) {
+		*key = NewInterval(mark, mark+add)
 		mark += add
 	}
 
@@ -79,7 +81,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 					"Target is %X, but actual %X, origin: %v",
 					0x5A, beginning, bs)
 		}
-		recordFunc("Fixed as 0x5A", 2)
+		recordFunc(&address.Fixed, 2)
 	}
 	{ // Stretch gain
 		// 2,4…254 2-step sequence
@@ -92,7 +94,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.StretchGain = stretchGain
-		recordFunc("Stretch gain", 2)
+		recordFunc(&address.StretchGain, 2)
 	}
 	{ // Speed
 		// 1,2,3…127
@@ -104,7 +106,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.Speed = speed
-		recordFunc("Speed", 2)
+		recordFunc(&address.Speed, 2)
 	}
 	{ // Punch
 		// 0,1,2,3…10
@@ -116,7 +118,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.Punch = punch
-		recordFunc("Punch", 2)
+		recordFunc(&address.Punch, 2)
 	}
 	{ // Dead band
 		// 0,1,2,3,4,5
@@ -132,7 +134,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 					bs[mark:mark+2], deadBand, bs, result)
 		}
 		result.DeadBand = deadBand
-		recordFunc("Dead band", 2)
+		recordFunc(&address.DeadBand, 2)
 	}
 	{ // Damping
 		// 1,2…255
@@ -144,7 +146,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.Damping = damping
-		recordFunc("Damping", 2)
+		recordFunc(&address.Damping, 2)
 	}
 	{ // Safe timer
 		// 10,11…255
@@ -157,7 +159,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.SafeTimer = safeTimer
-		recordFunc("Safe timer", 2)
+		recordFunc(&address.SafeTimer, 2)
 	}
 	{ // Flag
 		flagDetail := bs[mark : mark+2]
@@ -178,7 +180,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			Reverse:      flagDetail[1]&0b00000001 == 1,
 		}
 		result.Flag = flag
-		recordFunc("Flag", 2)
+		recordFunc(&address.Flag, 2)
 	}
 	{ // Maximum pulse limit
 		maximumPulseLimit, err := sliceByteToUint16(bs[mark : mark+4])
@@ -189,7 +191,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.MaximumPulseLimit = maximumPulseLimit
-		recordFunc("Maximum pulse limit", 4)
+		recordFunc(&address.MaximumPulseLimit, 4)
 	}
 	{ // Minimum pulse limit
 		minimumPulseLimit, err := sliceByteToUint16(bs[mark : mark+4])
@@ -200,7 +202,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.MinimumPulseLimit = minimumPulseLimit
-		recordFunc("Minimum pulse limit", 4)
+		recordFunc(&address.MinimumPulseLimit, 4)
 	}
 	mark += 2
 	{ // Signal speed
@@ -216,7 +218,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 		case 0x10:
 			result.SignalSpeed = Low
 		}
-		recordFunc("Signal speed", 2)
+		recordFunc(&address.SignalSpeed, 2)
 	}
 	{ // Temperature limit
 		temperatureLimit, err := sliceByteToUint8(bs[mark : mark+2])
@@ -227,7 +229,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.TemperatureLimit = temperatureLimit
-		recordFunc("Temperature limit", 2)
+		recordFunc(&address.TemperatureLimit, 2)
 	}
 	{ // Current limit
 		currentLimit, err := sliceByteToUint8(bs[mark : mark+2])
@@ -238,7 +240,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.CurrentLimit = currentLimit
-		recordFunc("Current limit", 2)
+		recordFunc(&address.CurrentLimit, 2)
 	}
 	for i := 0; i < 9; i++ {
 		mark += 2
@@ -252,7 +254,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.Response = response
-		recordFunc("Response", 2)
+		recordFunc(&address.Response, 2)
 	}
 	{ // User offset
 		fmt.Println(bs[mark : mark+2])
@@ -261,7 +263,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(err)
 		}
 		result.UserOffset = userOffset
-		recordFunc("User offset", 2)
+		recordFunc(&address.UserOffset, 2)
 	}
 	mark += 2
 	{ // ID
@@ -273,7 +275,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.ID = id
-		recordFunc("ID", 2)
+		recordFunc(&address.ID, 2)
 	}
 	{ // Characteristic change stretch 1
 		stretch1, err := sliceByteToUint8(bs[mark : mark+2])
@@ -284,7 +286,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.Wrapf(ErrDataMismatch, "actual: %d", stretch1)
 		}
 		result.CharacteristicChangeStretch1 = stretch1
-		recordFunc("Characteristic change stretch 1", 2)
+		recordFunc(&address.CharacteristicChangeStretch1, 2)
 	}
 	{ // Characteristic change stretch 2
 		stretch2, err := sliceByteToUint8(bs[mark : mark+2])
@@ -295,7 +297,7 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.CharacteristicChangeStretch2 = stretch2
-		recordFunc("Characteristic change stretch 2", 2)
+		recordFunc(&address.CharacteristicChangeStretch2, 2)
 	}
 	{ // Characteristic change stretch 3
 		stretch3, err := sliceByteToUint8(bs[mark : mark+2])
@@ -306,9 +308,9 @@ func Parsing(bs []byte) (EEPROM, error) {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.CharacteristicChangeStretch3 = stretch3
-		recordFunc("Characteristic change stretch 3", 2)
+		recordFunc(&address.CharacteristicChangeStretch3, 2)
 	}
-	print(recordAddress)
+	result.Address = address
 	return result, nil
 }
 func sliceByteToUint8(bs []byte) (uint8, error) {
