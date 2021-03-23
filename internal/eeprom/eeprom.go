@@ -49,8 +49,8 @@ const (
 )
 
 var (
-	// ErrDataLength is when the data length is not 66
-	ErrDataLength = errors.New("The data length is not 66")
+	// ErrDataLength is when the data length is not 64
+	ErrDataLength = errors.New("The data length is not 64")
 	// ErrDataMismatch is when The data is mismatch
 	ErrDataMismatch = errors.New("The data is mismatch")
 )
