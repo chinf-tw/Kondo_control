@@ -7,4 +7,5 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/schollz/croc/v8 v8.6.8 // indirect
 	golang.org/x/sys v0.0.0-20210223212115-eede4237b368 // indirect
+	gopkg.in/yaml.v2 v2.2.2
 )

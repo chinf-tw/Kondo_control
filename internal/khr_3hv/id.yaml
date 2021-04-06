@@ -1,0 +1,23 @@
+Head: 0
+Waist: 0
+LeftShoulderRoll: 1
+LeftShoulderPitch: 2
+LeftElbowRoll: 3
+LeftElbowPitch: 4
+LeftHipRoll: 5
+LeftHipPitch: 6
+LeftHipYaw: 7
+LeftKnee: 8
+LeftAnkleRoll: 9
+LeftAnklePitch: 10
+RightShoulderRoll: 1
+RightShoulderPitch: 2
+RightElbowRoll: 3
+RightElbowPitch: 4
+RightHipRoll: 5
+RightHipPitch: 6
+RightHipYaw: 7
+RightKnee: 8
+RightAnkleRoll: 9
+RightAnklePitch: 10
+ 
