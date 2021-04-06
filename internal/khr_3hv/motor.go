@@ -2,7 +2,6 @@ package khr_3hv
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"kondocontrol/internal/eeprom"
 	"kondocontrol/internal/serial"
@@ -68,6 +67,7 @@ func (m *Motor) SetID(id uint8) {
 	m.EEPROM.ID = id
 }
 
+// LoadYaml
 func (r *Robot) LoadYaml(y map[string]string) error {
 	val := reflect.Indirect(reflect.ValueOf(r))
 	for key, v := range y {
@@ -99,8 +99,5 @@ func (r *Robot) LoadYaml(y map[string]string) error {
 			}
 		}
 	}
-
-	fmt.Println(val.Type().Field(0).Name)
-	fmt.Println(y)
 	return nil
 }
