@@ -206,13 +206,13 @@ func TestCompose(t *testing.T) {
 	})
 	t.Run("MaximumPulseLimit", func(t *testing.T) {
 		targetEEPROM := ee
-		for i := uint16(3500); i <= 11500; i++ {
+		for i := MinimumPosition; i <= MaximumPosition; i++ {
 			targetEEPROM.MaximumPulseLimit = i
 			if err := checkFunc(dat, targetEEPROM); err != nil {
 				t.Fatalf("%+v\n", err)
 			}
 		}
-		for i := uint16(0); i < 3500; i++ {
+		for i := uint16(0); i < MinimumPosition; i++ {
 			targetEEPROM.MaximumPulseLimit = i
 			if err := checkFunc(dat, targetEEPROM); err == nil {
 				t.Fail()
@@ -228,13 +228,13 @@ func TestCompose(t *testing.T) {
 	})
 	t.Run("MinimumPulseLimit", func(t *testing.T) {
 		targetEEPROM := ee
-		for i := uint16(3500); i <= 11500; i++ {
+		for i := MinimumPosition; i <= MaximumPosition; i++ {
 			targetEEPROM.MinimumPulseLimit = i
 			if err := checkFunc(dat, targetEEPROM); err != nil {
 				t.Fatalf("%+v\n", err)
 			}
 		}
-		for i := uint16(0); i < 3500; i++ {
+		for i := uint16(0); i < MinimumPosition; i++ {
 			targetEEPROM.MinimumPulseLimit = i
 			if err := checkFunc(dat, targetEEPROM); err == nil {
 				t.Fail()

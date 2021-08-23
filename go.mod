@@ -3,6 +3,8 @@ module kondocontrol
 go 1.16
 
 require (
+	github.com/gin-gonic/gin v1.6.3
+	github.com/gorilla/websocket v1.4.2
 	github.com/jacobsa/go-serial v0.0.0-20180131005756-15cf729a72d4
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/pkg/errors v0.9.1

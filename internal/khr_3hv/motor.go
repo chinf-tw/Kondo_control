@@ -47,26 +47,26 @@ type Kind uint8
 const (
 	Head Kind = iota
 	Waist
-	LeftShoulderRoll
 	LeftShoulderPitch
+	LeftShoulderRoll
+	LeftElbowYaw
 	LeftElbowRoll
-	LeftElbowPitch
-	LeftHipRoll
 	LeftHipPitch
+	LeftHipRoll
 	LeftHipYaw
 	LeftKnee
-	LeftAnkleRoll
 	LeftAnklePitch
-	RightShoulderRoll
+	LeftAnkleRoll
 	RightShoulderPitch
+	RightShoulderRoll
+	RightElbowYaw
 	RightElbowRoll
-	RightElbowPitch
-	RightHipRoll
 	RightHipPitch
+	RightHipRoll
 	RightHipYaw
 	RightKnee
-	RightAnkleRoll
 	RightAnklePitch
+	RightAnkleRoll
 )
 
 //go:embed id.yaml
@@ -91,23 +91,25 @@ func DefaultRobotNum(leftPort, rightPort io.ReadWriteCloser) (RobotNum, error) {
 	// setting all port
 	r[Head].port = leftPort
 	r[Waist].port = rightPort
-	for i := LeftShoulderRoll; i <= LeftAnklePitch; i++ {
+	for i := LeftShoulderPitch; i <= LeftAnkleRoll; i++ {
 		r[i].port = leftPort
 	}
-	for i := RightShoulderRoll; i <= RightAnklePitch; i++ {
+	for i := RightShoulderPitch; i <= RightAnkleRoll; i++ {
 		r[i].port = rightPort
 	}
 	return r, nil
 }
-
+func LimitNum() int {
+	return int(RightAnklePitch)
+}
 func settingRobotNumID(r *RobotNum) {
 	r[Head].EEPROM.ID = 0
 	r[Waist].EEPROM.ID = 0
-	for i := LeftShoulderRoll; i <= LeftAnklePitch; i++ {
-		r[i].EEPROM.ID = uint8(i-LeftShoulderRoll) + 1
+	for i := LeftShoulderPitch; i <= LeftAnkleRoll; i++ {
+		r[i].EEPROM.ID = uint8(i-LeftShoulderPitch) + 1
 	}
-	for i := RightShoulderRoll; i <= RightAnklePitch; i++ {
-		r[i].EEPROM.ID = uint8(i-RightShoulderRoll) + 1
+	for i := RightShoulderPitch; i <= RightAnkleRoll; i++ {
+		r[i].EEPROM.ID = uint8(i-RightShoulderPitch) + 1
 	}
 }
 
@@ -121,8 +123,8 @@ type Motor struct {
 	port        io.ReadWriteCloser
 }
 
-// UpdateCurrentPositionWithFree
-func (m *Motor) UpdateCurrentPositionWithFree() error {
+// SetFree
+func (m *Motor) SetFree() error {
 	position, err := serial.SetFree(m.EEPROM.ID, m.port)
 	if err != nil {
 		return err

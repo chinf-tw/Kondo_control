@@ -48,6 +48,11 @@ const (
 	Low  SignalSpeed = 10
 )
 
+const (
+	MinimumPosition uint16 = 3500
+	MaximumPosition uint16 = 11500
+)
+
 var (
 	// ErrDataLength is when the data length is not 64
 	ErrDataLength = errors.New("The data length is not 64")
@@ -208,7 +213,7 @@ func Parse(bs []byte) (EEPROM, error) {
 		if err != nil {
 			return EEPROM{}, errors.WithStack(err)
 		}
-		if maximumPulseLimit < 3500 || maximumPulseLimit > 11500 {
+		if maximumPulseLimit < MinimumPosition || maximumPulseLimit > MaximumPosition {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.MaximumPulseLimit = maximumPulseLimit
@@ -219,7 +224,7 @@ func Parse(bs []byte) (EEPROM, error) {
 		if err != nil {
 			return EEPROM{}, errors.WithStack(err)
 		}
-		if minimumPulseLimit < 3500 || minimumPulseLimit > 11500 {
+		if minimumPulseLimit < MinimumPosition || minimumPulseLimit > MaximumPosition {
 			return EEPROM{}, errors.WithStack(ErrDataMismatch)
 		}
 		result.MinimumPulseLimit = minimumPulseLimit
