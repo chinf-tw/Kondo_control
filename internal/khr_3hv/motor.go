@@ -142,6 +142,12 @@ func (m *Motor) SetPosition(target uint) error {
 	m.Position = currentPos
 	return err
 }
+func (m Motor) SetSpeed(speedValue uint8) ([]byte, error) {
+	if speedValue > 127 {
+		return []byte{}, errors.New("speedValue 不可超過 127")
+	}
+	return serial.WriteEEPROM(m.GetID(), serial.ScSpeed, []byte{speedValue}, m.port)
+}
 
 // GetID
 func (m Motor) GetID() uint8 {
