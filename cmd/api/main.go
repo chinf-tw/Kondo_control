@@ -77,9 +77,43 @@ func apiRouter() *gin.Engine {
 		c.Next()
 	})
 	api.GET("/wscontrol", wscontrol)
+	api.GET("/batch_wscontrol", batchWscontrol)
 	api.GET("/control", control)
 
 	return api
+}
+func batchWscontrol(c *gin.Context) {
+	var upgrader = websocket.Upgrader{} // use default options
+	// websocket Upgrade
+	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println("upgrade:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "wesocket upgrade failed"})
+		return
+	}
+	defer ws.Close()
+
+	for {
+		msgType, msg, err := ws.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		if msgType == websocket.TextMessage {
+			// <number>,<angle>,<number>,<angle>,...
+			cmd := strings.Split(string(msg), ",")
+			if len(cmd)%2 != 0 || len(cmd) == 0 {
+				log.Printf("不正確輸入: len(cmd) = %d\n%s\n", len(cmd), cmd)
+				continue
+			}
+			for i := 0; i < len(cmd); i += 2 {
+				if err := stringToPosition(cmd[i], cmd[i+1]); err != nil {
+					log.Println(err)
+					continue
+				}
+			}
+		}
+	}
 }
 func wscontrol(c *gin.Context) {
 	var upgrader = websocket.Upgrader{} // use default options
